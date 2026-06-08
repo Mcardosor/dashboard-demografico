@@ -118,7 +118,7 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
         "40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79",
         "80-84","85-89","90-94","95-99","100+",
     ]
-    agg = df.groupby(["faixa_etaria", "sexo"])["populacao"].sum().reset_index()
+    agg = df.groupby(["faixa_etaria", "sexo"], observed=False)["populacao"].sum().reset_index()
     agg["faixa_etaria"] = agg["faixa_etaria"].astype(str)
     agg = agg[agg["faixa_etaria"].isin(FAIXAS)]
 
