@@ -59,20 +59,33 @@ with st.sidebar:
     todos = st.checkbox("Todos os estados", value=True, key="chk_todos", on_change=_on_todos_change)
 
     if not todos:
+        regiao_atual = st.session_state.get("sel_regiao", "— nenhum —")
         st.selectbox(
             "Filtrar por região:",
             options=["— nenhum —"] + list(REGIOES.keys()),
             key="sel_regiao",
             on_change=_on_regiao_change,
         )
-        ufs_sel = st.multiselect(
-            "Estados:",
-            options=_ufs_disp,
-            key="ms_ufs",
-            placeholder="Selecione estados...",
-        )
-        if not ufs_sel:
-            ufs_sel = _ufs_disp
+        regiao_atual = st.session_state.get("sel_regiao", "— nenhum —")
+
+        if regiao_atual != "— nenhum —":
+            _ufs_regiao = [u for u in REGIOES.get(regiao_atual, []) if u in _ufs_disp]
+            st.markdown(
+                f"<div style='background:rgba(88,166,255,.1);border:1px solid rgba(88,166,255,.3);"
+                f"border-radius:8px;padding:8px 12px;font-size:.82rem;color:#58a6ff;margin-top:4px'>"
+                f"📍 <b>{regiao_atual}</b> · {len(_ufs_regiao)} estados</div>",
+                unsafe_allow_html=True,
+            )
+            ufs_sel = _ufs_regiao
+        else:
+            ufs_sel = st.multiselect(
+                "Estados:",
+                options=_ufs_disp,
+                key="ms_ufs",
+                placeholder="Selecione estados...",
+            )
+            if not ufs_sel:
+                ufs_sel = _ufs_disp
     else:
         ufs_sel = _ufs_disp
 
