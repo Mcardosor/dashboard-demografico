@@ -57,16 +57,53 @@ def section_header(num: str, title: str, caption: str = "") -> str:
     {cap}"""
 
 
+def html_top5(df, t: dict) -> str:
+    rows = ""
+    medals = ["🥇", "🥈", "🥉", "4º", "5º"]
+    for i, (_, row) in enumerate(df.iterrows()):
+        rows += f"""
+        <tr style="border-bottom:1px solid {t['border']}">
+          <td style="padding:8px 10px;color:{t['text_muted']};font-size:.8rem">{medals[i]}</td>
+          <td style="padding:8px 10px;font-weight:700;color:{t['accent']}">{row['UF']}</td>
+          <td style="padding:8px 10px;text-align:right;font-weight:600;color:{t['text_title']}">{row['% Idosos']}</td>
+          <td style="padding:8px 10px;text-align:right;color:{t['text_muted']};font-size:.8rem">{row['Idosos']}</td>
+        </tr>"""
+    return f"""
+    <table style="width:100%;border-collapse:collapse;font-size:.85rem;
+                  background:{t['bg_card']};border-radius:10px;overflow:hidden;
+                  border:1px solid {t['border']}">
+      <thead>
+        <tr style="background:{t['bg']};border-bottom:2px solid {t['border']}">
+          <th style="padding:8px 10px;text-align:left;color:{t['text_muted']};font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">#</th>
+          <th style="padding:8px 10px;text-align:left;color:{t['text_muted']};font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">UF</th>
+          <th style="padding:8px 10px;text-align:right;color:{t['text_muted']};font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">% Idosos</th>
+          <th style="padding:8px 10px;text-align:right;color:{t['text_muted']};font-size:.72rem;text-transform:uppercase;letter-spacing:.05em">Total Idosos</th>
+        </tr>
+      </thead>
+      <tbody>{rows}</tbody>
+    </table>"""
+
+
 def _apply_layout(fig: go.Figure, t: dict, height: int = H_MEDIUM) -> go.Figure:
     fig.update_layout(
         height=height,
         paper_bgcolor=t["bg_plot"],
         plot_bgcolor=t["bg_plot"],
-        font_color=t["text"],
-        font_size=12,
+        font=dict(color=t["text"], size=12),
         margin=dict(l=10, r=10, t=30, b=10),
-        legend=dict(bgcolor=t["bg_card"], bordercolor=t["border"], borderwidth=1),
+        legend=dict(
+            bgcolor=t["bg_card"], bordercolor=t["border"], borderwidth=1,
+            font=dict(color=t["text"]),
+        ),
     )
-    fig.update_xaxes(gridcolor=t["grid"], linecolor=t["border"], zerolinecolor=t["border"])
-    fig.update_yaxes(gridcolor=t["grid"], linecolor=t["border"], zerolinecolor=t["border"])
+    fig.update_xaxes(
+        gridcolor=t["grid"], linecolor=t["border"], zerolinecolor=t["border"],
+        tickfont=dict(color=t["text_muted"]),
+        title_font=dict(color=t["text"]),
+    )
+    fig.update_yaxes(
+        gridcolor=t["grid"], linecolor=t["border"], zerolinecolor=t["border"],
+        tickfont=dict(color=t["text_muted"]),
+        title_font=dict(color=t["text"]),
+    )
     return fig

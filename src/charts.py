@@ -26,8 +26,8 @@ def processar_dados(df: pd.DataFrame):
 
 def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
     is_light    = t["bg"] == "#f6f8fa"
-    map_style   = "carto-positron" if is_light else "carto-darkmatter"
-    color_scale = "Blues"          if is_light else "YlOrRd"
+    map_style   = "open-street-map" if is_light else "carto-darkmatter"
+    color_scale = "Blues"           if is_light else "YlOrRd"
 
     fig = px.choropleth_mapbox(
         df_idosos,
@@ -38,8 +38,8 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
         color_continuous_scale=color_scale,
         range_color=(0, df_idosos["pct_idosos"].max()),
         mapbox_style=map_style,
-        zoom=2.8,
-        center={"lat": -12.0, "lon": -52.0},
+        zoom=3.15,
+        center={"lat": -14.5, "lon": -51.5},
         opacity=0.75,
         labels={"pct_idosos": "% Idosos", "uf": "UF"},
         custom_data=["uf", "pct_idosos", "idosos", "total"],
@@ -71,28 +71,43 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
 
 
 def fig_pizza(df: pd.DataFrame, t: dict, apenas_idosos: bool = False) -> go.Figure:
+    from .utils import _fmt
     df_pie = df[df["idade"] >= 60].copy() if apenas_idosos else df.copy()
     agg = df_pie.groupby("sexo")["populacao"].sum().reset_index()
     agg["label"] = agg["sexo"].map({"M": "Masculino", "F": "Feminino"})
+    total = agg["populacao"].sum()
 
     fig = px.pie(
         agg, names="label", values="populacao", color="label",
         color_discrete_map={"Masculino": COLOR_M, "Feminino": COLOR_F},
-        hole=0.42,
+        hole=0.55,
     )
     fig.update_traces(
         textposition="inside",
-        textinfo="percent+label",
+        texttemplate="%{percent:.1%}",
+        textfont=dict(size=14, color="#ffffff"),
         insidetextorientation="horizontal",
-        hovertemplate="<b>%{label}</b><br>%{value:,}<br>%{percent}<extra></extra>",
+        hovertemplate="<b>%{label}</b><br>%{value:,} pessoas<br>%{percent:.1%}<extra></extra>",
         marker_line_color=t["bg"],
-        marker_line_width=2,
+        marker_line_width=3,
         pull=[0.03, 0.03],
     )
     _apply_layout(fig, t, H_MEDIUM)
     fig.update_layout(
         showlegend=True,
-        legend=dict(orientation="h", yanchor="bottom", y=-0.12, xanchor="center", x=0.5),
+        legend=dict(
+            orientation="h",
+            yanchor="bottom", y=-0.08,
+            xanchor="center", x=0.5,
+            font=dict(size=13, color=t["text"]),
+            bgcolor="rgba(0,0,0,0)",
+        ),
+        margin=dict(l=20, r=20, t=20, b=20),
+        annotations=[dict(
+            text=f"<b>{_fmt(total)}</b><br><span style='font-size:11px'>{('idosos' if apenas_idosos else 'pessoas')}</span>",
+            x=0.5, y=0.5, font=dict(size=18, color=t["text_title"]),
+            showarrow=False, align="center",
+        )],
     )
     return fig
 
@@ -129,16 +144,17 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
     fig.update_layout(
         barmode="relative", bargap=0.08,
         xaxis=dict(
-            title="← Masculino  |  Feminino →",
+            title=dict(text="← Masculino  |  Feminino →", font=dict(color=t["text"])),
             tickmode="array",
             tickvals=list(range(-int(max_val * 1.1), int(max_val * 1.1) + 1, tick_step)),
             ticktext=[f"{abs(v):,}" for v in range(-int(max_val * 1.1), int(max_val * 1.1) + 1, tick_step)],
             range=[-max_val * 1.15, max_val * 1.15],
             zeroline=True, zerolinecolor=t["border"], zerolinewidth=2,
+            tickfont=dict(color=t["text_muted"]),
         ),
-        yaxis=dict(title="", tickfont=dict(size=10)),
-        legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5),
-        margin=dict(l=10, r=20, t=30, b=60),
+        yaxis=dict(title="", tickfont=dict(size=10, color=t["text"])),
+        showlegend=False,
+        margin=dict(l=10, r=20, t=30, b=40),
     )
     return fig
 
@@ -155,8 +171,8 @@ def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
     fig.update_layout(
         coloraxis_showscale=False,
         margin=dict(l=10, r=80, t=20, b=10),
-        xaxis=dict(title="Proporção de idosos (%)"),
-        yaxis=dict(title=""),
+        xaxis=dict(title=dict(text="Proporção de idosos (%)", font=dict(color=t["text"])), tickfont=dict(color=t["text_muted"])),
+        yaxis=dict(title="", tickfont=dict(color=t["text"])),
     )
     fig.update_traces(
         texttemplate="%{text:.2f}%", textposition="outside",
@@ -186,8 +202,8 @@ def fig_evolucao(df_evo: pd.DataFrame, ufs: list, t: dict) -> go.Figure:
     from .utils import H_MEDIUM
     _apply_layout(fig, t, H_MEDIUM)
     fig.update_layout(
-        xaxis=dict(title="", tickmode="linear", dtick=1),
-        yaxis=dict(title="Milhões de habitantes"),
+        xaxis=dict(title="", tickmode="linear", dtick=1, tickfont=dict(color=t["text_muted"])),
+        yaxis=dict(title=dict(text="Milhões de habitantes", font=dict(color=t["text"])), tickfont=dict(color=t["text_muted"])),
         margin=dict(l=10, r=10, t=20, b=10),
     )
     return fig

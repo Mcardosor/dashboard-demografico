@@ -169,16 +169,26 @@ def _css(t: dict) -> str:
   /* ── Widgets nativos do Streamlit ── */
 
   /* Botões */
-  [data-testid="baseButton-secondary"],
-  [data-testid="baseButton-primary"] {{
-    background-color: {t['bg_card']} !important;
+  .stButton > button {{
+    background-color: transparent !important;
     color: {t['text']} !important;
     border: 1px solid {t['border']} !important;
     border-radius: 8px !important;
+    font-weight: 500 !important;
+    width: 100%;
   }}
-  [data-testid="baseButton-secondary"]:hover,
-  [data-testid="baseButton-primary"]:hover {{
+  .stButton > button p,
+  .stButton > button span,
+  .stButton > button div {{
+    color: {t['text']} !important;
+  }}
+  .stButton > button:hover {{
+    background-color: {t['accent']}18 !important;
     border-color: {t['accent']} !important;
+    color: {t['accent']} !important;
+  }}
+  .stButton > button:hover p,
+  .stButton > button:hover span {{
     color: {t['accent']} !important;
   }}
 
@@ -203,9 +213,18 @@ def _css(t: dict) -> str:
   }}
 
   /* Checkbox e Toggle */
+  .stCheckbox label, .stCheckbox p, .stCheckbox span,
+  .stToggle label, .stToggle p, .stToggle span,
   [data-testid="stCheckbox"] label,
-  [data-testid="stToggle"] label {{
+  [data-testid="stCheckbox"] p,
+  [data-testid="stToggle"] label,
+  [data-testid="stToggle"] p,
+  [data-testid="stToggle"] > label > div > p,
+  [data-testid="stToggle"] > label > div,
+  div[class*="toggle"] p,
+  div[class*="checkbox"] p {{
     color: {t['text']} !important;
+    opacity: 1 !important;
   }}
 
   /* Divider */

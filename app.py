@@ -3,7 +3,7 @@ import streamlit as st
 from src.themes import THEMES, _css
 from src.data import anos_disponiveis, carregar_dados, carregar_evolucao, carregar_geojson
 from src.charts import processar_dados, fig_mapa, fig_pizza, fig_piramide, fig_ranking, fig_evolucao
-from src.utils import PLOTLY_CFG, REGIOES, _fmt, _delta_html, kpi_card, section_header
+from src.utils import PLOTLY_CFG, REGIOES, _fmt, _delta_html, kpi_card, section_header, html_top5
 
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
@@ -192,16 +192,14 @@ with col_pizza:
 
     st.markdown("**Top 5 — % de idosos**")
     top5 = (
-        df_id_filt[["uf", "pct_idosos", "idosos", "total"]]
+        df_id_filt[["uf", "pct_idosos", "idosos"]]
         .sort_values("pct_idosos", ascending=False).head(5)
-        .rename(columns={"uf": "UF", "pct_idosos": "% Idosos", "idosos": "Idosos", "total": "Total"})
+        .rename(columns={"uf": "UF", "pct_idosos": "% Idosos", "idosos": "Idosos"})
         .reset_index(drop=True)
     )
-    top5.index = range(1, 6)
     top5["% Idosos"] = top5["% Idosos"].map("{:.2f}%".format)
     top5["Idosos"]   = top5["Idosos"].map("{:,.0f}".format)
-    top5["Total"]    = top5["Total"].map("{:,.0f}".format)
-    st.dataframe(top5, use_container_width=True, height=210)
+    st.markdown(html_top5(top5, t), unsafe_allow_html=True)
 
 st.divider()
 
