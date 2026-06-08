@@ -36,7 +36,7 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
         featureidkey="properties.sigla",
         color="pct_idosos",
         color_continuous_scale=color_scale,
-        range_color=(df_idosos["pct_idosos"].min(), df_idosos["pct_idosos"].max()),
+        range_color=(0, df_idosos["pct_idosos"].max()),
         mapbox_style=map_style,
         zoom=2.8,
         center={"lat": -12.0, "lon": -52.0},
@@ -81,8 +81,9 @@ def fig_pizza(df: pd.DataFrame, t: dict, apenas_idosos: bool = False) -> go.Figu
         hole=0.42,
     )
     fig.update_traces(
-        textposition="outside",
+        textposition="inside",
         textinfo="percent+label",
+        insidetextorientation="horizontal",
         hovertemplate="<b>%{label}</b><br>%{value:,}<br>%{percent}<extra></extra>",
         marker_line_color=t["bg"],
         marker_line_width=2,
@@ -144,7 +145,7 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
 
 def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
     df_r = df_idosos.sort_values("pct_idosos", ascending=True)
-    color_scale = "Blues_r" if t["bg"] == "#f6f8fa" else "YlOrRd"
+    color_scale = "Blues" if t["bg"] == "#f6f8fa" else "YlOrRd"
     fig = px.bar(
         df_r, x="pct_idosos", y="uf", orientation="h",
         color="pct_idosos", color_continuous_scale=color_scale,

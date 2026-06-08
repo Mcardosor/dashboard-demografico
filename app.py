@@ -65,8 +65,6 @@ with st.sidebar:
 
     st.divider()
 
-    filtrar_idosos_pizza = st.checkbox("Sexo apenas para ≥ 60 anos", value=False)
-
 # ── Tema aplicado ─────────────────────────────────────────────────────────────
 t = THEMES[st.session_state.theme]
 st.markdown(_css(t), unsafe_allow_html=True)
@@ -106,7 +104,7 @@ else:
             ufs_sel = ufs_disponiveis
 
 with st.sidebar:
-    st.caption(f"📊 **{_fmt(pop_total)}** hab. · **{len(ufs_sel)}** de {n_ufs} estados\nFonte: IBGE · {ano_sel}")
+    st.caption(f"📊 **{_fmt(pop_total)}** hab. · **{len(ufs_sel)}** de {n_ufs} estados · IBGE {ano_sel}")
 
 # ── Métricas filtradas ────────────────────────────────────────────────────────
 df_filt    = df_proc[df_proc["uf"].isin(ufs_sel)]
@@ -188,10 +186,8 @@ with col_mapa:
         st.plotly_chart(fig_bar, use_container_width=True, config=PLOTLY_CFG)
 
 with col_pizza:
-    _titulo_pizza = "Distribuição por Sexo — Idosos (≥ 60)" if filtrar_idosos_pizza else "Distribuição por Sexo"
-    st.markdown(section_header("02", _titulo_pizza,
-        "Apenas maiores de 60 anos." if filtrar_idosos_pizza else "Toda a população selecionada."),
-        unsafe_allow_html=True)
+    st.markdown(section_header("02", "Distribuição por Sexo"), unsafe_allow_html=True)
+    filtrar_idosos_pizza = st.toggle("Apenas ≥ 60 anos", value=False)
     st.plotly_chart(fig_pizza(df_filt, t, filtrar_idosos_pizza), use_container_width=True, config=PLOTLY_CFG)
 
     st.markdown("**Top 5 — % de idosos**")

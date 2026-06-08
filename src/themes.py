@@ -166,6 +166,78 @@ def _css(t: dict) -> str:
   hr {{ border-color: {t['grid']} !important; margin: 24px 0 !important; }}
   .stDataFrame {{ border-color: {t['border']} !important; border-radius: 8px !important; }}
 
+  /* ── Widgets nativos do Streamlit ── */
+
+  /* Botões */
+  [data-testid="baseButton-secondary"],
+  [data-testid="baseButton-primary"] {{
+    background-color: {t['bg_card']} !important;
+    color: {t['text']} !important;
+    border: 1px solid {t['border']} !important;
+    border-radius: 8px !important;
+  }}
+  [data-testid="baseButton-secondary"]:hover,
+  [data-testid="baseButton-primary"]:hover {{
+    border-color: {t['accent']} !important;
+    color: {t['accent']} !important;
+  }}
+
+  /* Selectbox */
+  [data-testid="stSelectbox"] > div > div {{
+    background-color: {t['bg_card']} !important;
+    border-color: {t['border']} !important;
+    color: {t['text']} !important;
+  }}
+  [data-testid="stSelectbox"] label,
+  [data-testid="stSelectbox"] span {{
+    color: {t['text_muted']} !important;
+  }}
+
+  /* Multiselect */
+  [data-testid="stMultiSelect"] > div > div {{
+    background-color: {t['bg_card']} !important;
+    border-color: {t['border']} !important;
+  }}
+  [data-testid="stMultiSelect"] label {{
+    color: {t['text_muted']} !important;
+  }}
+
+  /* Checkbox e Toggle */
+  [data-testid="stCheckbox"] label,
+  [data-testid="stToggle"] label {{
+    color: {t['text']} !important;
+  }}
+
+  /* Divider */
+  [data-testid="stDivider"] hr {{
+    border-color: {t['border']} !important;
+  }}
+
+  /* Caption / texto pequeno */
+  [data-testid="stCaptionContainer"] p {{
+    color: {t['text_muted']} !important;
+  }}
+
+  /* Sidebar labels */
+  section[data-testid="stSidebar"] label,
+  section[data-testid="stSidebar"] p,
+  section[data-testid="stSidebar"] span {{
+    color: {t['text']} !important;
+  }}
+
+  /* Input text dropdown */
+  [data-baseweb="select"] * {{
+    background-color: {t['bg_card']} !important;
+    color: {t['text']} !important;
+  }}
+  [data-baseweb="popover"] * {{
+    background-color: {t['bg_card']} !important;
+    color: {t['text']} !important;
+  }}
+  [data-baseweb="menu"] li:hover {{
+    background-color: {t['accent']}20 !important;
+  }}
+
   /* Esconde deploy button nativo */
   .stDeployButton {{ display: none !important; }}
 </style>
