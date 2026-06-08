@@ -9,7 +9,6 @@ import os
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import psycopg2
 import streamlit as st
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -142,65 +141,48 @@ def _delta_html(val: float, prev: float, unit: str = "", invert: bool = False) -
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-#  CONEXÃO — somente leitura
+#  DADOS — leitura local de Parquet (sem banco)
 # ══════════════════════════════════════════════════════════════════════════════
-_DB = dict(
-    host=st.secrets["db"]["host"],
-    port=int(st.secrets["db"]["port"]),
-    dbname=st.secrets["db"]["dbname"],
-    user=st.secrets["db"]["user"],
-    password=st.secrets["db"]["password"],
-)
+_DIR = os.path.dirname(__file__)
 
 
-def _conn():
-    return psycopg2.connect(**_DB)
+@st.cache_data(show_spinner=False)
+def _carregar_base() -> pd.DataFrame:
+    pop  = pd.read_parquet(os.path.join(_DIR, "pop_ibge.parquet"))
+    mun  = pd.read_parquet(os.path.join(_DIR, "ibge_municipios.parquet"))
+    ufs  = pd.read_parquet(os.path.join(_DIR, "ibge_ufs.parquet"))
+
+    pop["cod_mun"] = pop["cod_mun"].astype("int64")
+    pop = (
+        pop
+        .merge(mun.rename(columns={"id": "cod_mun"}), on="cod_mun")
+        .merge(ufs.rename(columns={"id": "ibge_uf_id"})[["ibge_uf_id", "sigla"]], on="ibge_uf_id")
+    )
+    pop["idade"]    = pop["idade"].astype(int)
+    pop["sexo"]     = pop["sexo"].map({"1": "M", "2": "F"})
+    return pop[["sigla", "ano", "idade", "sexo", "populacao"]].rename(columns={"sigla": "uf"})
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-#  QUERIES
-# ══════════════════════════════════════════════════════════════════════════════
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(show_spinner=False)
 def anos_disponiveis() -> list[int]:
-    with _conn() as c:
-        df = pd.read_sql("SELECT DISTINCT ano FROM pop_ibge ORDER BY ano DESC", c)
-    return df["ano"].tolist()
+    df = _carregar_base()
+    return sorted(df["ano"].unique().tolist(), reverse=True)
 
 
-@st.cache_data(show_spinner="Carregando dados populacionais…", ttl=3600)
+@st.cache_data(show_spinner="Carregando dados populacionais…")
 def carregar_dados(ano: int) -> pd.DataFrame:
-    query = """
-        SELECT
-            u.sigla                                     AS uf,
-            CAST(p.idade AS INTEGER)                    AS idade,
-            CASE p.sexo WHEN '1' THEN 'M' ELSE 'F' END AS sexo,
-            SUM(p.populacao)                            AS populacao
-        FROM pop_ibge p
-        JOIN ibge_municipios m ON m.id = CAST(p.cod_mun AS BIGINT)
-        JOIN ibge_ufs u        ON u.id = m.ibge_uf_id
-        WHERE p.ano = %s
-        GROUP BY u.sigla, p.idade, p.sexo
-        ORDER BY u.sigla, p.idade, p.sexo
-    """
-    with _conn() as c:
-        return pd.read_sql(query, c, params=(ano,))
+    df = _carregar_base()
+    return (
+        df[df["ano"] == ano]
+        .groupby(["uf", "idade", "sexo"], as_index=False)["populacao"]
+        .sum()
+    )
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
+@st.cache_data(show_spinner=False)
 def carregar_evolucao() -> pd.DataFrame:
-    query = """
-        SELECT
-            u.sigla  AS uf,
-            p.ano,
-            SUM(p.populacao) AS populacao
-        FROM pop_ibge p
-        JOIN ibge_municipios m ON m.id = CAST(p.cod_mun AS BIGINT)
-        JOIN ibge_ufs u        ON u.id = m.ibge_uf_id
-        GROUP BY u.sigla, p.ano
-        ORDER BY u.sigla, p.ano
-    """
-    with _conn() as c:
-        return pd.read_sql(query, c)
+    df = _carregar_base()
+    return df.groupby(["uf", "ano"], as_index=False)["populacao"].sum()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
