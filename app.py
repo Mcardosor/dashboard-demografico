@@ -25,6 +25,18 @@ _ano_default = st.session_state.get("ano_sel", _anos[0])
 _df_default  = carregar_dados(_ano_default)
 _ufs_disp    = sorted(_df_default["uf"].unique().tolist())
 
+# ── Callbacks ────────────────────────────────────────────────────────────────
+def _on_regiao_change():
+    regiao = st.session_state.get("sel_regiao", "— nenhum —")
+    st.session_state["ms_ufs"] = (
+        [u for u in REGIOES.get(regiao, []) if u in _ufs_disp]
+        if regiao != "— nenhum —" else []
+    )
+
+def _on_todos_change():
+    if not st.session_state.get("chk_todos", True):
+        st.session_state["ms_ufs"] = []
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
     _th = THEMES[st.session_state.theme]
@@ -44,24 +56,20 @@ with st.sidebar:
     st.divider()
     st.markdown("**🗺️ Estados**")
 
-    todos = st.checkbox("Todos os estados", value=True, key="chk_todos")
+    todos = st.checkbox("Todos os estados", value=True, key="chk_todos", on_change=_on_todos_change)
 
     if not todos:
-        regiao_sel = st.selectbox(
-            "Atalho por região:",
+        st.selectbox(
+            "Filtrar por região:",
             options=["— nenhum —"] + list(REGIOES.keys()),
             key="sel_regiao",
+            on_change=_on_regiao_change,
         )
-        if regiao_sel != "— nenhum —":
-            default_ufs = [u for u in REGIOES.get(regiao_sel, []) if u in _ufs_disp]
-        else:
-            default_ufs = _ufs_disp
-
         ufs_sel = st.multiselect(
-            "Selecione os estados:",
+            "Estados:",
             options=_ufs_disp,
-            default=default_ufs,
             key="ms_ufs",
+            placeholder="Selecione estados...",
         )
         if not ufs_sel:
             ufs_sel = _ufs_disp
