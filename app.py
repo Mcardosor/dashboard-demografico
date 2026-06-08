@@ -19,9 +19,14 @@ if "theme" not in st.session_state:
 GEOJSON = carregar_geojson()
 _anos   = anos_disponiveis()
 
+# ── Dados carregados antes da sidebar ─────────────────────────────────────────
+# Carrega com ano padrão para ter ufs_disponiveis na sidebar
+_ano_default = st.session_state.get("ano_sel", _anos[0])
+_df_default  = carregar_dados(_ano_default)
+_ufs_disp    = sorted(_df_default["uf"].unique().tolist())
+
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    # Tema
     _th = THEMES[st.session_state.theme]
     if st.button(
         f"{_th['toggle_icon']}  {_th['toggle_label']}",
@@ -33,39 +38,40 @@ with st.sidebar:
 
     st.divider()
 
-    # Ano
-    ano_sel = st.selectbox(
-        "📅 Ano de referência",
-        options=_anos,
-        index=0,
-    )
+    ano_sel = st.selectbox("📅 Ano de referência", options=_anos, index=0, key="ano_sel")
     ano_ant = _anos[_anos.index(ano_sel) + 1] if _anos.index(ano_sel) + 1 < len(_anos) else None
 
     st.divider()
-
-    # Filtro de estados — limpo
     st.markdown("**🗺️ Estados**")
 
     todos = st.checkbox("Todos os estados", value=True, key="chk_todos")
 
-    if todos:
-        ufs_sel = None  # resolvido depois do carregamento
-    else:
+    if not todos:
         regiao_sel = st.selectbox(
             "Atalho por região:",
             options=["— nenhum —"] + list(REGIOES.keys()),
             key="sel_regiao",
         )
+        if regiao_sel != "— nenhum —":
+            default_ufs = [u for u in REGIOES.get(regiao_sel, []) if u in _ufs_disp]
+        else:
+            default_ufs = _ufs_disp
 
         ufs_sel = st.multiselect(
             "Selecione os estados:",
-            options=[],          # preenchido depois do carregamento
+            options=_ufs_disp,
+            default=default_ufs,
             key="ms_ufs",
         )
+        if not ufs_sel:
+            ufs_sel = _ufs_disp
+    else:
+        ufs_sel = _ufs_disp
 
     st.divider()
+    filtrar_idosos_pizza = False  # definido abaixo no card
 
-# ── Tema aplicado ─────────────────────────────────────────────────────────────
+# ── Tema ──────────────────────────────────────────────────────────────────────
 t = THEMES[st.session_state.theme]
 st.markdown(_css(t), unsafe_allow_html=True)
 
@@ -77,31 +83,8 @@ df_evo             = carregar_evolucao()
 df_ant                     = carregar_dados(ano_ant) if ano_ant else None
 df_proc_ant, df_idosos_ant = processar_dados(df_ant) if df_ant is not None else (None, None)
 
-pop_total      = int(df_proc["populacao"].sum())
-n_ufs          = df_proc["uf"].nunique()
-ufs_disponiveis = sorted(df_proc["uf"].unique().tolist())
-
-# Resolve ufs_sel agora que os dados estão carregados
-if todos:
-    ufs_sel = ufs_disponiveis
-else:
-    # Atalho por região
-    if "sel_regiao" in st.session_state and st.session_state.sel_regiao != "— nenhum —":
-        regiao_ufs = REGIOES.get(st.session_state.sel_regiao, [])
-        default_ufs = [u for u in regiao_ufs if u in ufs_disponiveis]
-    else:
-        default_ufs = ufs_disponiveis
-
-    # Re-renderiza multiselect com opções reais
-    with st.sidebar:
-        ufs_sel = st.multiselect(
-            "Selecione os estados:",
-            options=ufs_disponiveis,
-            default=default_ufs,
-            key="ms_ufs_real",
-        )
-        if not ufs_sel:
-            ufs_sel = ufs_disponiveis
+pop_total = int(df_proc["populacao"].sum())
+n_ufs     = df_proc["uf"].nunique()
 
 with st.sidebar:
     st.caption(f"📊 **{_fmt(pop_total)}** hab. · **{len(ufs_sel)}** de {n_ufs} estados · IBGE {ano_sel}")
@@ -148,13 +131,13 @@ st.markdown(f"""
 # ── KPIs ──────────────────────────────────────────────────────────────────────
 kpi_items = [
     ("👥", "População total",     _fmt(pop_filt),             f"{len(ufs_sel)} estado(s)",
-     _delta_html(pop_filt, pop_ant),         "blue"),
+     _delta_html(pop_filt, pop_ant),            "blue"),
     ("👴", "Proporção de idosos", f"{pct_idog_filt:.1f}%",    "≥ 60 anos",
-     _delta_html(pct_idog_filt, pct_idog_ant), "orange"),
+     _delta_html(pct_idog_filt, pct_idog_ant),  "orange"),
     ("♀️", "Proporção feminina",  f"{pct_fem_filt:.1f}%",     "sobre o total",
-     _delta_html(pct_fem_filt, pct_fem_ant),  "purple"),
+     _delta_html(pct_fem_filt, pct_fem_ant),    "purple"),
     ("📅", "Idade média",         f"{idade_med_filt:.1f} anos","média ponderada",
-     _delta_html(idade_med_filt, idade_ant),  "green"),
+     _delta_html(idade_med_filt, idade_ant),    "green"),
 ]
 
 cols = st.columns(4)
@@ -165,7 +148,7 @@ for col, (icon, title, value, sub, delta, color) in zip(cols, kpi_items):
 st.markdown("<div style='margin-bottom:8px'></div>", unsafe_allow_html=True)
 st.divider()
 
-# ── 01 · Mapa + Pizza ─────────────────────────────────────────────────────────
+# ── 01 · Mapa + 02 · Pizza ────────────────────────────────────────────────────
 col_mapa, col_pizza = st.columns([4, 2], gap="large")
 
 with col_mapa:
