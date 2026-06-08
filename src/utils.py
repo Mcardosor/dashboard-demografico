@@ -1,8 +1,16 @@
 import plotly.graph_objects as go
 
 PLOTLY_CFG = {"displayModeBar": False, "scrollZoom": False}
-H_SMALL, H_MEDIUM, H_LARGE = 320, 420, 520
+H_SMALL, H_MEDIUM, H_LARGE = 320, 420, 540
 COLOR_M, COLOR_F = "#58a6ff", "#f778ba"
+
+REGIOES = {
+    "Norte":     ["AC","AM","AP","PA","RO","RR","TO"],
+    "Nordeste":  ["AL","BA","CE","MA","PB","PE","PI","RN","SE"],
+    "Centro-Oeste": ["DF","GO","MS","MT"],
+    "Sudeste":   ["ES","MG","RJ","SP"],
+    "Sul":       ["PR","RS","SC"],
+}
 
 
 def _fmt(n: float) -> str:
@@ -25,15 +33,28 @@ def _delta_html(val: float, prev: float, invert: bool = False) -> str:
     return f'<span class="{cls}">{arrow} {abs(pct):.1f}% vs ano anterior</span>'
 
 
-def kpi_card(title: str, value: str, subtitle: str, icon: str, delta_html: str = "") -> str:
+def kpi_card(title: str, value: str, subtitle: str, icon: str,
+             delta_html: str = "", color: str = "blue") -> str:
     return f"""
-    <div class="kpi-card">
-      <div class="kpi-icon">{icon}</div>
-      <div class="kpi-title">{title}</div>
+    <div class="kpi-card {color}">
+      <div class="kpi-header">
+        <div class="kpi-title">{title}</div>
+        <div class="kpi-icon">{icon}</div>
+      </div>
       <div class="kpi-value">{value}</div>
       <div class="kpi-sub">{subtitle}</div>
-      {f'<div style="margin-top:6px">{delta_html}</div>' if delta_html else ''}
+      {f'<div style="margin-top:4px">{delta_html}</div>' if delta_html else ''}
     </div>"""
+
+
+def section_header(num: str, title: str, caption: str = "") -> str:
+    cap = f'<p class="section-caption">{caption}</p>' if caption else ""
+    return f"""
+    <div class="section-header">
+      <span class="section-num">{num}</span>
+      <h3 class="section-title">{title}</h3>
+    </div>
+    {cap}"""
 
 
 def _apply_layout(fig: go.Figure, t: dict, height: int = H_MEDIUM) -> go.Figure:
