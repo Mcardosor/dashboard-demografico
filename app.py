@@ -96,6 +96,15 @@ with st.sidebar:
 t = THEMES[st.session_state.theme]
 st.markdown(_css(t), unsafe_allow_html=True)
 
+if st.session_state.theme == "light":
+    st.markdown("""
+    <div class="cenarios-bar">
+      <span class="cenarios-bar-logo">Cenários<span>+</span></span>
+      <span class="cenarios-bar-sep">|</span>
+      <span class="cenarios-bar-title">Dashboard Demográfico</span>
+    </div>
+    """, unsafe_allow_html=True)
+
 # ── Dados ─────────────────────────────────────────────────────────────────────
 df_raw             = carregar_dados(ano_sel)
 df_proc, df_idosos = processar_dados(df_raw)

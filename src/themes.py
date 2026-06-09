@@ -25,15 +25,16 @@ THEMES = {
         "bg_card":     "rgba(255,255,255,.98)",
         "bg_plot":     "rgba(0,0,0,0)",
         "text":        "#24292f",
-        "text_title":  "#1f2328",
+        "text_title":  "#1a3a5c",
         "text_muted":  "#57606a",
         "border":      "#d0d7de",
-        "border_hero": "#d0d7de",
+        "border_hero": "#b8d4ee",
         "grid":        "#eaecef",
-        "accent":      "#0969da",
+        "accent":      "#2B7BB9",
+        "accent2":     "#E07B54",
         "success":     "#1a7f37",
         "danger":      "#cf222e",
-        "hero_bg":     "linear-gradient(135deg,#ffffff 0%,#f6f8fa 60%,#dce8f8 100%)",
+        "hero_bg":     "linear-gradient(135deg,#ffffff 0%,#eaf2fb 60%,#d4e8f6 100%)",
         "map_line":    "#d0d7de",
         "bar_line":    "#f6f8fa",
         "footer":      "#8c959f",
@@ -159,6 +160,34 @@ def _css(t: dict) -> str:
   .section-caption {{
     color: {t['text_muted']}; font-size: .82rem;
     margin: 0 0 12px; line-height: 1.5;
+  }}
+
+  /* ── Cenários+ header bar (tema claro apenas) ── */
+  .cenarios-bar {{
+    background: #2B7BB9;
+    padding: 8px 24px;
+    margin: -1rem -1rem 1.5rem -1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }}
+  .cenarios-bar-logo {{
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.3px;
+  }}
+  .cenarios-bar-logo span {{
+    color: #E07B54;
+  }}
+  .cenarios-bar-sep {{
+    color: rgba(255,255,255,.4);
+    margin: 0 6px;
+  }}
+  .cenarios-bar-title {{
+    font-size: .85rem;
+    font-weight: 500;
+    color: rgba(255,255,255,.85);
   }}
 
   /* ── Misc ── */

@@ -25,9 +25,9 @@ def processar_dados(df: pd.DataFrame):
 
 
 def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
-    is_light    = t["bg"] == "#f6f8fa"
+    is_light    = t.get("toggle_icon") == "🌙"
     map_style   = "open-street-map" if is_light else "carto-darkmatter"
-    color_scale = "Blues"           if is_light else "YlOrRd"
+    color_scale = "Blues" if is_light else "YlOrRd"
 
     fig = px.choropleth_mapbox(
         df_idosos,
@@ -161,7 +161,7 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
 
 def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
     df_r = df_idosos.sort_values("pct_idosos", ascending=True)
-    color_scale = "Blues" if t["bg"] == "#f6f8fa" else "YlOrRd"
+    color_scale = "Blues" if t.get("toggle_icon") == "🌙" else "YlOrRd"
     fig = px.bar(
         df_r, x="pct_idosos", y="uf", orientation="h",
         color="pct_idosos", color_continuous_scale=color_scale,
