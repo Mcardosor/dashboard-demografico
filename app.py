@@ -14,7 +14,7 @@ st.set_page_config(
 )
 
 if "theme" not in st.session_state:
-    st.session_state.theme = "dark"
+    st.session_state.theme = "light"
 
 GEOJSON = carregar_geojson()
 _anos   = anos_disponiveis()
