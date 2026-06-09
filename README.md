@@ -53,7 +53,7 @@ dashboard-demografico/
 
 ```bash
 # clone o repositório
-git clone <url-do-repo>
+git clone github.com/Mcardosor/dashboard-demografico
 cd dashboard-demografico
 
 # instale as dependências
