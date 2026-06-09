@@ -1,6 +1,6 @@
 import plotly.graph_objects as go
 
-PLOTLY_CFG = {"displayModeBar": False, "scrollZoom": False}
+PLOTLY_CFG = {"displayModeBar": True, "scrollZoom": False}
 H_SMALL, H_MEDIUM, H_LARGE = 320, 420, 540
 COLOR_M, COLOR_F = "#58a6ff", "#f778ba"
 
@@ -59,7 +59,7 @@ def section_header(num: str, title: str, caption: str = "") -> str:
 
 def html_top5(df, t: dict) -> str:
     rows = ""
-    medals = ["🥇", "🥈", "🥉"] + [f"{i}º" for i in range(4, len(df) + 1)]
+    medals = [f"{i}º" for i in range(1, len(df) + 1)]
     for i, (_, row) in enumerate(df.iterrows()):
         rows += f"""
         <tr style="border-bottom:1px solid {t['border']}">
