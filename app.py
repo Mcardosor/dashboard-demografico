@@ -246,9 +246,16 @@ with col_rank:
 st.divider()
 
 # ── Footer ────────────────────────────────────────────────────────────────────
-st.markdown(
-    f"<div style='text-align:center;padding:16px 0 6px;color:{t['footer']};font-size:.75rem;letter-spacing:.03em'>"
-    f"DASHBOARD DEMOGRÁFICO &nbsp;·&nbsp; Fonte: IBGE {ano_sel} &nbsp;·&nbsp; cenarios_ai"
-    f"</div>",
-    unsafe_allow_html=True,
-)
+st.markdown("""
+<div style="
+    background:#2B7BB9;
+    border-radius:12px;
+    padding:28px 36px;
+    margin-top:8px;
+">
+    <div style="font-size:1.2rem;font-weight:800;color:#ffffff;letter-spacing:-0.3px;margin-bottom:4px;">
+        Cenários<span style="color:#E07B54">+</span>
+    </div>
+    <div style="font-size:.82rem;color:rgba(255,255,255,.75);">Todos os direitos reservados.</div>
+</div>
+""", unsafe_allow_html=True)
