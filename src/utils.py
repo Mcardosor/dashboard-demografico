@@ -59,7 +59,7 @@ def section_header(num: str, title: str, caption: str = "") -> str:
 
 def html_top5(df, t: dict) -> str:
     rows = ""
-    medals = ["🥇", "🥈", "🥉", "4º", "5º"]
+    medals = ["🥇", "🥈", "🥉"] + [f"{i}º" for i in range(4, len(df) + 1)]
     for i, (_, row) in enumerate(df.iterrows()):
         rows += f"""
         <tr style="border-bottom:1px solid {t['border']}">

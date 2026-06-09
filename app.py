@@ -178,8 +178,8 @@ for col, (icon, title, value, sub, delta, color) in zip(cols, kpi_items):
 st.markdown("<div style='margin-bottom:8px'></div>", unsafe_allow_html=True)
 st.divider()
 
-# ── 01 · Mapa + 02 · Pizza ────────────────────────────────────────────────────
-col_mapa, col_pizza = st.columns([4, 2], gap="large")
+# ── 01 · Mapa + 02 · Top 5 ───────────────────────────────────────────────────
+col_mapa, col_top5 = st.columns([4, 2], gap="large")
 
 with col_mapa:
     st.markdown(section_header("01", "Proporção de Idosos por Estado",
@@ -198,43 +198,50 @@ with col_mapa:
         fig_bar.update_layout(coloraxis_showscale=False)
         st.plotly_chart(fig_bar, use_container_width=True, config=PLOTLY_CFG)
 
-with col_pizza:
-    st.markdown(section_header("02", "Distribuição por Sexo"), unsafe_allow_html=True)
-    filtrar_idosos_pizza = st.toggle("Apenas ≥ 60 anos", value=False)
-    st.plotly_chart(fig_pizza(df_filt, t, filtrar_idosos_pizza), use_container_width=True, config=PLOTLY_CFG)
-
-    st.markdown("**Top 5 — % de idosos**")
-    top5 = (
+with col_top5:
+    st.markdown(section_header("02", "Top estados — % de idosos",
+        "Estados com maior proporção de pessoas com 60 anos ou mais."), unsafe_allow_html=True)
+    top_n = min(15, len(df_id_filt))
+    top15 = (
         df_id_filt[["uf", "pct_idosos", "idosos"]]
-        .sort_values("pct_idosos", ascending=False).head(5)
+        .sort_values("pct_idosos", ascending=False).head(top_n)
         .rename(columns={"uf": "UF", "pct_idosos": "% Idosos", "idosos": "Idosos"})
         .reset_index(drop=True)
     )
-    top5["% Idosos"] = top5["% Idosos"].map("{:.2f}%".format)
-    top5["Idosos"]   = top5["Idosos"].map("{:,.0f}".format)
-    st.markdown(html_top5(top5, t), unsafe_allow_html=True)
+    top15["% Idosos"] = top15["% Idosos"].map("{:.2f}%".format)
+    top15["Idosos"]   = top15["Idosos"].map("{:,.0f}".format)
+    st.markdown(html_top5(top15, t), unsafe_allow_html=True)
 
 st.divider()
 
-# ── 03 · Pirâmide ─────────────────────────────────────────────────────────────
-st.markdown(section_header("03", "Pirâmide Etária",
-    "Distribuição por faixa de 5 anos e sexo. Base larga = pop. jovem · Topo largo = pop. envelhecida."),
-    unsafe_allow_html=True)
-st.plotly_chart(fig_piramide(df_filt, t), use_container_width=True, config=PLOTLY_CFG)
+# ── 03 · Distribuição por Sexo + 04 · Pirâmide Etária ────────────────────────
+col_pizza, col_piramide = st.columns([1, 1], gap="large")
+
+with col_pizza:
+    st.markdown(section_header("03", "Distribuição por Sexo"), unsafe_allow_html=True)
+    filtrar_idosos_pizza = st.toggle("Apenas ≥ 60 anos", value=False)
+    st.plotly_chart(fig_pizza(df_filt, t, filtrar_idosos_pizza), use_container_width=True, config=PLOTLY_CFG)
+
+with col_piramide:
+    st.markdown(section_header("04", "Pirâmide Etária",
+        "Distribuição por faixa de 5 anos e sexo. Base larga = pop. jovem · Topo largo = pop. envelhecida."),
+        unsafe_allow_html=True)
+    st.plotly_chart(fig_piramide(df_filt, t), use_container_width=True, config=PLOTLY_CFG)
 
 st.divider()
 
-# ── 04 · Evolução ─────────────────────────────────────────────────────────────
-st.markdown(section_header("04", "Evolução Populacional — 2010 a 2025",
-    "Total de habitantes nos estados selecionados ao longo dos anos."), unsafe_allow_html=True)
-st.plotly_chart(fig_evolucao(df_evo, ufs_sel, t), use_container_width=True, config=PLOTLY_CFG)
+# ── 05 · Evolução + 06 · Ranking ─────────────────────────────────────────────
+col_evo, col_rank = st.columns([1, 1], gap="large")
 
-st.divider()
+with col_evo:
+    st.markdown(section_header("05", "Evolução Populacional — 2010 a 2025",
+        "Total de habitantes nos estados selecionados ao longo dos anos."), unsafe_allow_html=True)
+    st.plotly_chart(fig_evolucao(df_evo, ufs_sel, t), use_container_width=True, config=PLOTLY_CFG)
 
-# ── 05 · Ranking ──────────────────────────────────────────────────────────────
-st.markdown(section_header("05", "Ranking — Proporção de Idosos por Estado",
-    "Estados ordenados pela proporção de pessoas com 60+ anos."), unsafe_allow_html=True)
-st.plotly_chart(fig_ranking(df_id_filt, t), use_container_width=True, config=PLOTLY_CFG)
+with col_rank:
+    st.markdown(section_header("06", "Ranking — Proporção de Idosos por Estado",
+        "Estados ordenados pela proporção de pessoas com 60+ anos."), unsafe_allow_html=True)
+    st.plotly_chart(fig_ranking(df_id_filt, t), use_container_width=True, config=PLOTLY_CFG)
 
 st.divider()
 
