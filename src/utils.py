@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 
 PLOTLY_CFG = {"displayModeBar": True, "scrollZoom": False}
-H_SMALL, H_MEDIUM, H_LARGE = 320, 420, 540
+H_SMALL, H_MEDIUM, H_LARGE = 320, 420, 680
 COLOR_M, COLOR_F = "#58a6ff", "#f778ba"
 
 REGIOES = {

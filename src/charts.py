@@ -38,8 +38,8 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
         color_continuous_scale=color_scale,
         range_color=(0, df_idosos["pct_idosos"].max()),
         mapbox_style=map_style,
-        zoom=3.8,
-        center={"lat": -14.0, "lon": -52.0},
+        zoom=3.5,
+        center={"lat": -14.5, "lon": -56.0},
         opacity=0.75,
         labels={"pct_idosos": "% Idosos", "uf": "UF"},
         custom_data=["uf", "pct_idosos", "idosos", "total"],
@@ -49,6 +49,7 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
         paper_bgcolor=t["bg_plot"],
         font_color=t["text"],
         margin=dict(l=0, r=0, t=0, b=0),
+        mapbox=dict(bounds={"west": -75, "east": -28, "south": -35, "north": 7}),
         coloraxis_colorbar=dict(
             title=dict(text="% Idosos", font=dict(color=t["text"])),
             tickfont=dict(color=t["text_muted"]),
