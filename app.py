@@ -13,6 +13,27 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+
+# ── Warmup: pré-aquece cache na inicialização ──────────────────────────────
+@st.cache_resource(show_spinner=False)
+def _iniciar_warmup():
+    """Roda uma vez por processo — pré-carrega dados mais comuns em background."""
+    import threading
+    def _bg():
+        try:
+            from src.data import carregar_dados, carregar_evolucao, carregar_geojson
+            carregar_geojson()
+            carregar_evolucao()
+            anos = anos_disponiveis()
+            if anos:
+                carregar_dados(anos[0])
+        except Exception:
+            pass
+    threading.Thread(target=_bg, daemon=True).start()
+    return True
+_iniciar_warmup()
+# ───────────────────────────────────────────────────────────────────────────
+
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 

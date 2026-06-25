@@ -3,7 +3,13 @@ services:
     build: .
     container_name: dashboard-demografico
     ports:
-      - "8501:8501"
+      - 8501:8501
     restart: unless-stopped
     volumes:
       - ./data:/app/data:ro
+    healthcheck:
+      test: [CMD, curl, -f, http://localhost:8501/cenarios/demografico/_stcore/health]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

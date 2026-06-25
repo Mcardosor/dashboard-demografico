@@ -73,12 +73,8 @@ def _css(t: dict) -> str:
     overflow: hidden;
   }}
   .hero::before {{
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, {t['accent']}18 0%, transparent 70%);
-    border-radius: 50%;
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, #E07B54 0%, #2B7BB9 50%, #1a7f37 100%);
   }}
   .hero-title {{
     font-size: 2.1rem; font-weight: 800; color: {t['text_title']};
@@ -288,5 +284,33 @@ def _css(t: dict) -> str:
 
   /* Esconde deploy button nativo */
   .stDeployButton {{ display: none !important; }}
+
+  /* ── Tabs pill ── */
+  .stTabs {{ margin-top: 1rem; }}
+  .stTabs [data-baseweb="tab-list"] {{
+    gap: 4px; background: rgba(0,0,0,.02); padding: 6px;
+    border-radius: 12px; border: 1px solid {t['border']};
+    flex-wrap: wrap !important; overflow-x: auto;
+  }}
+  .stTabs [data-baseweb="tab"] {{
+    padding: 8px 14px !important; border-radius: 8px !important;
+    font-weight: 600 !important; font-size: 13px !important;
+    color: {t['text_muted']};
+    white-space: nowrap; flex: 1 1 auto !important;
+    text-align: center !important; cursor: pointer !important;
+    border: 1px solid transparent !important;
+  }}
+  .stTabs [data-baseweb="tab"]:hover {{
+    background: rgba(0,0,0,.04) !important;
+    border-color: {t['border']} !important;
+    color: {t['text']} !important;
+  }}
+  .stTabs [aria-selected="true"] {{
+    background: rgba(224,123,84,.1) !important;
+    border-color: rgba(224,123,84,.3) !important;
+    color: {t['text_title']} !important;
+    box-shadow: 0 2px 8px rgba(224,123,84,.1) !important;
+  }}
+  .stTabs [data-baseweb="tab-panel"] {{ padding-top: 1.25rem; }}
 </style>
 """

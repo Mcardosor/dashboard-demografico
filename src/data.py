@@ -7,7 +7,7 @@ import streamlit as st
 _DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def carregar_geojson() -> dict:
     path = os.path.join(_DATA_DIR, "brazil-states.geojson")
     with open(path, encoding="utf-8") as f:
@@ -46,6 +46,6 @@ def carregar_dados(ano: int) -> pd.DataFrame:
     )
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def carregar_evolucao() -> pd.DataFrame:
     return _carregar_base().groupby(["uf", "ano"], as_index=False)["populacao"].sum()
