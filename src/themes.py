@@ -333,7 +333,9 @@ _DARK_CSS = """
   [data-theme=dark] .kpi-title { color: #8b949e !important; }
   [data-theme=dark] .kpi-sub   { color: #8b949e !important; }
   [data-theme="dark"] .hero { background: linear-gradient(135deg,#161b22 0%,#0d1117 60%,#0d2137 100%) !important; border-color: #21262d !important; }
-  [data-theme="dark"] .hero-title { color: #f0f6fc !important; }
+  [data-theme=dark] .hero-title { color: #f0f6fc !important; }
+  [data-theme=dark] .hero-subtitle a, [data-theme=dark] .hero-subtitle a:visited { color: #c9d1d9 !important; text-decoration: none !important; }
+  [data-theme=dark] .hero p a, [data-theme=dark] .hero span a { color: #c9d1d9 !important; text-decoration: none !important; }
   [data-theme="dark"] .hero-subtitle, [data-theme="dark"] .hero-badge { color: #8b949e !important; border-color: #30363d !important; background: rgba(255,255,255,.04) !important; }
   [data-theme="dark"] .stTabs [data-baseweb="tab-list"] { background: rgba(255,255,255,.03) !important; border-color: #30363d !important; }
   [data-theme="dark"] .stTabs [data-baseweb="tab"] { color: #8b949e !important; }
