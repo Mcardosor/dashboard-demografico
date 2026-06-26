@@ -25,9 +25,9 @@ def processar_dados(df: pd.DataFrame):
 
 
 def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
-    is_light    = t.get("toggle_icon") == "🌙"
-    map_style   = "open-street-map" if is_light else "carto-darkmatter"
-    color_scale = "Blues" if is_light else "YlOrRd"
+    map_style   = "carto-positron"
+
+    color_scale = [[0, "#084c96"], [0.5, "#2B7BB9"], [1, "#63b3ed"]]
 
     fig = px.choropleth_mapbox(
         df_idosos,
@@ -162,15 +162,14 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
 
 def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
     df_r = df_idosos.sort_values("pct_idosos", ascending=True)
-    color_scale = "Blues" if t.get("toggle_icon") == "🌙" else "YlOrRd"
     fig = px.bar(
         df_r, x="pct_idosos", y="uf", orientation="h",
-        color="pct_idosos", color_continuous_scale=color_scale,
+        color_discrete_sequence=[t["accent"]],
         text="pct_idosos", labels={"pct_idosos": "% Idosos", "uf": "Estado"},
     )
     _apply_layout(fig, t, max(300, len(df_r) * 22))
     fig.update_layout(
-        coloraxis_showscale=False,
+
         margin=dict(l=10, r=80, t=20, b=10),
         xaxis=dict(title=dict(text="Proporção de idosos (%)", font=dict(color=t["text"])), tickfont=dict(color=t["text_muted"])),
         yaxis=dict(title="", tickfont=dict(color=t["text"])),
