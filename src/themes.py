@@ -162,7 +162,7 @@ def _css(t: dict) -> str:
   .cenarios-bar {{
     background: #2B7BB9;
     padding: 8px 24px;
-    margin: -1rem -1rem 1.5rem -1rem;
+    margin: 0.5rem -1rem 1.5rem -1rem;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -416,6 +416,9 @@ _THEME_TOGGLE_JS = """
 
   var obs = new p.MutationObserver(function() { ensureButton(); });
   obs.observe(p.document.body, { childList: true });
+
+  // Evitar auto-scroll do Streamlit que empurra a cenarios-bar para cima
+  setTimeout(function() { p.scrollTo(0, 0); }, 300);
 })();
 </script>
 """
