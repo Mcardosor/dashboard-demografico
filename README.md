@@ -18,6 +18,10 @@ Visualização interativa dos dados populacionais do IBGE por estado, com foco n
 
 ---
 
+> **Acesso:** http://164.41.147.175:8501/cenarios/demografico
+
+---
+
 ## Stack
 
 | Camada | Tecnologia |
