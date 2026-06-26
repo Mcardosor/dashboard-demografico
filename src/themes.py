@@ -328,7 +328,10 @@ _DARK_CSS = """
   [data-theme="dark"] p, [data-theme="dark"] span, [data-theme="dark"] label { color: #c9d1d9 !important; }
   [data-theme="dark"] [data-testid="stCaption"] { color: #8b949e !important; }
   [data-theme="dark"] hr { background: linear-gradient(90deg,transparent,#30363d,transparent) !important; }
-  [data-theme="dark"] .kpi-card { background: rgba(22,27,34,.92) !important; border-color: #30363d !important; }
+  [data-theme=dark] .kpi-card { background: rgba(22,27,34,.92) !important; border-left-color: #30363d !important; border-right-color: #30363d !important; border-bottom-color: #30363d !important; }
+  [data-theme=dark] .kpi-value { color: #f0f6fc !important; }
+  [data-theme=dark] .kpi-title { color: #8b949e !important; }
+  [data-theme=dark] .kpi-sub   { color: #8b949e !important; }
   [data-theme="dark"] .hero { background: linear-gradient(135deg,#161b22 0%,#0d1117 60%,#0d2137 100%) !important; border-color: #21262d !important; }
   [data-theme="dark"] .hero-title { color: #f0f6fc !important; }
   [data-theme="dark"] .hero-subtitle, [data-theme="dark"] .hero-badge { color: #8b949e !important; border-color: #30363d !important; background: rgba(255,255,255,.04) !important; }
