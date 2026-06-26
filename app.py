@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.themes import THEMES, _css
+from src.themes import THEMES, _css, inject_toggle
 from src.data import anos_disponiveis, carregar_dados, carregar_evolucao, carregar_geojson
 from src.charts import processar_dados, fig_mapa, fig_pizza, fig_piramide, fig_ranking, fig_evolucao
 from src.utils import PLOTLY_CFG, REGIOES, _fmt, _delta_html, kpi_card, section_header, html_top5
@@ -60,15 +60,6 @@ def _on_todos_change():
 
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 with st.sidebar:
-    _th = THEMES[st.session_state.theme]
-    if st.button(
-        f"{_th['toggle_icon']}  {_th['toggle_label']}",
-        key="btn_theme",
-        use_container_width=True,
-    ):
-        st.session_state.theme = "light" if st.session_state.theme == "dark" else "dark"
-        st.rerun()
-
     st.divider()
 
     ano_sel = st.selectbox("📅 Ano de referência", options=_anos, index=0, key="ano_sel")
@@ -117,6 +108,8 @@ with st.sidebar:
 t = THEMES[st.session_state.theme]
 st.markdown(_css(t), unsafe_allow_html=True)
 
+st.markdown("<style>iframe[height='50']{display:none!important;margin:0;padding:0;height:0!important}</style>", unsafe_allow_html=True)
+inject_toggle()
 if st.session_state.theme == "light":
     st.markdown("""
     <div class="cenarios-bar">

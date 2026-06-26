@@ -314,3 +314,116 @@ def _css(t: dict) -> str:
   .stTabs [data-baseweb="tab-panel"] {{ padding-top: 1.25rem; }}
 </style>
 """
+
+
+# ── Dark CSS overrides (para JS toggle) ──────────────────────────────────────
+_DARK_CSS = """
+  [data-theme="dark"] [data-testid="stAppViewContainer"],
+  [data-theme="dark"] [data-testid="stMain"],
+  [data-theme="dark"] .block-container { background-color: #0d1117 !important; }
+  [data-theme="dark"] [data-testid="stSidebar"] > div:first-child { background: #010409 !important; border-right: 1px solid #30363d !important; }
+  [data-theme="dark"] [data-testid="stSidebar"] * { color: #c9d1d9 !important; }
+  [data-theme="dark"] [data-testid="stHeader"] { background: #0d1117 !important; }
+  [data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 { color: #f0f6fc !important; }
+  [data-theme="dark"] p, [data-theme="dark"] span, [data-theme="dark"] label { color: #c9d1d9 !important; }
+  [data-theme="dark"] [data-testid="stCaption"] { color: #8b949e !important; }
+  [data-theme="dark"] hr { background: linear-gradient(90deg,transparent,#30363d,transparent) !important; }
+  [data-theme="dark"] .kpi-card { background: rgba(22,27,34,.92) !important; border-color: #30363d !important; }
+  [data-theme="dark"] .hero { background: linear-gradient(135deg,#161b22 0%,#0d1117 60%,#0d2137 100%) !important; border-color: #21262d !important; }
+  [data-theme="dark"] .hero-title { color: #f0f6fc !important; }
+  [data-theme="dark"] .hero-subtitle, [data-theme="dark"] .hero-badge { color: #8b949e !important; border-color: #30363d !important; background: rgba(255,255,255,.04) !important; }
+  [data-theme="dark"] .stTabs [data-baseweb="tab-list"] { background: rgba(255,255,255,.03) !important; border-color: #30363d !important; }
+  [data-theme="dark"] .stTabs [data-baseweb="tab"] { color: #8b949e !important; }
+  [data-theme="dark"] .stTabs [aria-selected="true"] { background: rgba(224,123,84,.12) !important; border-color: rgba(224,123,84,.3) !important; color: #f0f6fc !important; }
+  [data-theme="dark"] [data-testid="stExpander"] { background: #161b22 !important; border-color: #30363d !important; }
+  [data-theme="dark"] .js-plotly-plot .plotly .bg { fill: #161b22 !important; }
+  [data-theme="dark"] .js-plotly-plot .plotly .g-gtitle text,
+  [data-theme="dark"] .js-plotly-plot .plotly .xtick text,
+  [data-theme="dark"] .js-plotly-plot .plotly .ytick text { fill: #8b949e !important; }
+  [data-theme="dark"] .js-plotly-plot .plotly .gridlayer path { stroke: #21262d !important; }
+  [data-theme="dark"] #_tb_theme_btn { background: rgba(22,27,34,.9) !important; border-color: #30363d !important; color: #e6edf3 !important; }
+"""
+
+_THEME_TOGGLE_JS = """
+<script>
+(function() {
+  var KEY = 'demografico_dash_theme';
+  var p = window.parent;
+
+  function applyTheme(t) {
+    p.document.documentElement.setAttribute('data-theme', t);
+    p.localStorage.setItem(KEY, t);
+    var btn = p.document.getElementById('_tb_theme_btn');
+    if (btn) btn.innerHTML = t === 'dark' ? '☀️' : '🌙';
+    if (btn) btn.title = t === 'dark' ? 'Modo claro' : 'Modo escuro';
+  }
+
+  function toggle() {
+    var cur = p.document.documentElement.getAttribute('data-theme') || 'light';
+    var next = cur === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    // Clica o botão Streamlit da sidebar para re-renderizar gráficos
+    var sidebarBtns = p.document.querySelectorAll('[data-testid="stSidebar"] button');
+    if (sidebarBtns.length > 0) { sidebarBtns[0].click(); }
+  }
+
+  function ensureStyle() {
+    if (p.document.getElementById('_demo_dark_css')) return;
+    var s = p.document.createElement('style');
+    s.id = '_demo_dark_css';
+    s.textContent = DARK_CSS_PLACEHOLDER;
+    p.document.head.appendChild(s);
+  }
+
+  function ensureButton() {
+    if (p.document.getElementById('_tb_theme_btn')) return;
+    var btn = p.document.createElement('button');
+    btn.id = '_tb_theme_btn';
+    btn.onclick = toggle;
+    var saved = p.localStorage.getItem(KEY) || 'light';
+    btn.innerHTML = saved === 'dark' ? '☀️' : '🌙';
+    btn.title = saved === 'dark' ? 'Modo claro' : 'Modo escuro';
+    btn.style.cssText = [
+      'position:fixed','top:8px','z-index:9999999',
+      'width:32px','height:32px','border-radius:8px',
+      'border:1px solid rgba(0,0,0,.15)','background:rgba(255,255,255,.92)',
+      'backdrop-filter:blur(8px)','cursor:pointer',
+      'font-size:18px','line-height:1','padding:0',
+      'box-shadow:0 1px 4px rgba(0,0,0,.15)',
+      'transition:transform .12s,background .2s',
+      'display:flex','align-items:center','justify-content:center'
+    ].join(';');
+    function _pos() {
+      var vw = p.document.documentElement.clientWidth || p.innerWidth;
+      btn.style.left = Math.max(0, vw - 122) + 'px';
+    }
+    _pos();
+    p.addEventListener('resize', _pos);
+    btn.onmouseover = function() { btn.style.transform = 'scale(1.1)'; };
+    btn.onmouseout  = function() { btn.style.transform = 'scale(1)'; };
+    p.document.body.appendChild(btn);
+  }
+
+  function init() {
+    ensureStyle();
+    var saved = p.localStorage.getItem(KEY) || 'light';
+    applyTheme(saved);
+    ensureButton();
+  }
+
+  if (p.document.readyState === 'complete') { init(); }
+  else { p.addEventListener('load', init); }
+
+  var obs = new p.MutationObserver(function() { ensureButton(); });
+  obs.observe(p.document.body, { childList: true });
+})();
+</script>
+"""
+
+
+def inject_toggle() -> None:
+    """Injeta floating button lua/sol via iframe — identico ao TB SINAN e TB Recife."""
+    import streamlit.components.v1 as components
+    dark_css_escaped = _DARK_CSS.replace('\n', ' ').replace("'", "\'").replace('"', '\\"')
+    js = _THEME_TOGGLE_JS.replace('DARK_CSS_PLACEHOLDER', f"'{dark_css_escaped}'")
+    components.html(js, height=50, scrolling=False)
