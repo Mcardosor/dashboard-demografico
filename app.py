@@ -193,7 +193,7 @@ st.markdown("<div style='margin-bottom:8px'></div>", unsafe_allow_html=True)
 st.divider()
 
 # ── 01 · Mapa + 02 · Top 5 ───────────────────────────────────────────────────
-col_mapa, col_top5 = st.columns([4, 2], gap="large")
+col_mapa, col_top5 = st.columns([3, 2])
 
 with col_mapa:
     st.markdown(section_header("01", "Proporção de Idosos por Estado",
