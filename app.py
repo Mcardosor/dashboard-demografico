@@ -261,7 +261,7 @@ st.divider()
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div style="
+<div class="cenarios-footer" style="
     background:#2B7BB9;
     border-radius:12px;
     padding:28px 36px;

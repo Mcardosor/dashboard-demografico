@@ -426,6 +426,12 @@ _THEME_TOGGLE_JS = """
   setTimeout(function() { p.scrollTo(0, 0); }, 300);
 })();
 </script>
+
+  /* ── Footer dark mode ─── */
+  [data-theme="dark"] .cenarios-footer {
+    background: #161b22 !important;
+    border-top: 1px solid #30363d !important;
+  }
 """
 
 
