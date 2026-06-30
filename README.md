@@ -4,7 +4,7 @@ Visualização da distribuição etária da população brasileira por estado, c
 
 ![preview do dashboard](docs/preview.png)
 
-Acesso: http://164.41.147.175:8501/cenarios/demografico
+Acesso (requer VPN): http://164.41.147.175:8501/cenarios/demografico
 
 ## Conteúdo
 
