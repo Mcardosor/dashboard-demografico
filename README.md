@@ -20,6 +20,7 @@ Acesso: https://telessaude.unb.br/cenarios/demografico
 
 | Documento | Descrição |
 |---|---|
+| [Arquitetura](docs/ARQUITETURA.md) | Fluxo de dados ponta a ponta, módulos, deploy e limitações — comece por aqui |
 | [Documentação dos Gráficos](docs/DOCUMENTACAO_GRAFICOS.md) | Por que cada gráfico existe, como é calculado e o código |
 
 ## Filtros
