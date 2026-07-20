@@ -4,7 +4,7 @@ Visualização da distribuição etária da população brasileira por estado, c
 
 ![preview do dashboard](docs/preview.png)
 
-Acesso: https://telessaude.unb.br/cenarios/demografico
+Acesso: https://painel.cenarios.unb.br/cenarios/demografico
 
 ## Conteúdo
 

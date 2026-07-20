@@ -50,7 +50,7 @@ Nenhuma variável de ambiente é necessária — não há credenciais, banco ou 
 
 - **Imagem:** `docker-compose.yml` builda a imagem a partir do `Dockerfile` (Python 3.11-slim + Streamlit), com `COPY . .` — o código vai embutido na imagem, não em bind mount (só `data/` é bind-mounted, read-only).
 - **Container:** `dashboard-demografico`, porta **8501**.
-- **Produção (VM):** `/home/matheusrodrigues/dashboard-demografico/`, exposto via nginx em `https://telessaude.unb.br/cenarios/demografico` (proxy_pass pra `localhost:8501`).
+- **Produção (VM):** `/home/matheusrodrigues/dashboard-demografico/`, exposto via nginx em `https://painel.cenarios.unb.br/cenarios/demografico` (proxy_pass pra `localhost:8501`).
 - **Rebuild após mudança de código:** como o código é `COPY`, uma alteração em `app.py`/`src/` exige `docker compose up -d --build` (bind mount não é suficiente pra pegar a mudança).
 
 ## Limitações conhecidas
