@@ -46,6 +46,14 @@ THEMES = {
 
 
 def _css(t: dict) -> str:
+    """Monta o CSS global do app (hero, KPI cards, tabs, sidebar, widgets nativos).
+
+    Args:
+        t: dicionário de tema (`THEMES["light"]` ou `THEMES["dark"]`).
+
+    Returns:
+        str: tag `<style>` completa, pronta para `st.markdown(..., unsafe_allow_html=True)`.
+    """
     return f"""
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');

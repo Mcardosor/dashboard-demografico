@@ -14,6 +14,14 @@ REGIOES = {
 
 
 def _fmt(n: float) -> str:
+    """Formata um número grande de forma compacta (1.2M, 340.5K, 87).
+
+    Args:
+        n: valor numérico a formatar.
+
+    Returns:
+        str: número formatado com sufixo M/K quando aplicável.
+    """
     if abs(n) >= 1_000_000:
         return f"{n/1_000_000:.1f}M"
     if abs(n) >= 1_000:
@@ -22,6 +30,18 @@ def _fmt(n: float) -> str:
 
 
 def _delta_html(val: float, prev: float, invert: bool = False) -> str:
+    """Monta o HTML do indicador de variação (▲/▼ X% vs ano anterior).
+
+    Args:
+        val: valor do período atual.
+        prev: valor do período anterior; se 0, não há comparação possível.
+        invert: quando True, inverte a semântica de cor (útil para métricas
+            onde "subir" é ruim, ex: mortalidade).
+
+    Returns:
+        str: HTML pronto para `unsafe_allow_html`, ou string vazia se não
+            houver valor anterior para comparar.
+    """
     if prev == 0:
         return ""
     diff = val - prev
@@ -35,6 +55,20 @@ def _delta_html(val: float, prev: float, invert: bool = False) -> str:
 
 def kpi_card(title: str, value: str, subtitle: str, icon: str,
              delta_html: str = "", color: str = "blue") -> str:
+    """Monta o HTML de um card de KPI (título, valor, subtítulo e variação).
+
+    Args:
+        title: rótulo do indicador (ex: "População total").
+        value: valor já formatado para exibição (ex: "12.3M").
+        subtitle: texto pequeno abaixo do valor.
+        icon: emoji exibido no canto do card.
+        delta_html: HTML da variação vs. período anterior (ver `_delta_html`),
+            omitido do card se vazio.
+        color: nome da cor de destaque (classe CSS `.kpi-card.{color}`).
+
+    Returns:
+        str: HTML pronto para `unsafe_allow_html`.
+    """
     return f"""
     <div class="kpi-card {color}">
       <div class="kpi-header">
@@ -48,6 +82,16 @@ def kpi_card(title: str, value: str, subtitle: str, icon: str,
 
 
 def section_header(num: str, title: str, caption: str = "") -> str:
+    """Monta o cabeçalho numerado de cada seção do dashboard (ex: "01 · Mapa").
+
+    Args:
+        num: número da seção, como string com dois dígitos (ex: "01").
+        title: título da seção.
+        caption: legenda opcional exibida abaixo do título.
+
+    Returns:
+        str: HTML pronto para `unsafe_allow_html`.
+    """
     cap = f'<p class="section-caption">{caption}</p>' if caption else ""
     return f"""
     <div class="section-header">
@@ -58,6 +102,16 @@ def section_header(num: str, title: str, caption: str = "") -> str:
 
 
 def html_top5(df, t: dict) -> str:
+    """Monta a tabela HTML do ranking Top 5/15 de estados por % de idosos.
+
+    Args:
+        df: DataFrame já ordenado e formatado, com colunas `UF`,
+            `% Idosos` e `Idosos` (strings prontas para exibição).
+        t: dicionário de tema (cores) atual, ver `src.themes.THEMES`.
+
+    Returns:
+        str: HTML da tabela, pronto para `unsafe_allow_html`.
+    """
     rows = ""
     medals = [f"{i}º" for i in range(1, len(df) + 1)]
     for i, (_, row) in enumerate(df.iterrows()):
@@ -85,6 +139,19 @@ def html_top5(df, t: dict) -> str:
 
 
 def _apply_layout(fig: go.Figure, t: dict, height: int = H_MEDIUM) -> go.Figure:
+    """Aplica o tema (cores, grade, legenda) e a altura padrão a uma figura Plotly.
+
+    Centraliza o estilo visual comum entre os gráficos para evitar repetir
+    a mesma configuração de eixos/legenda em cada função `fig_*`.
+
+    Args:
+        fig: figura Plotly já construída (traces já adicionados).
+        t: dicionário de tema (cores) atual, ver `src.themes.THEMES`.
+        height: altura em pixels do gráfico.
+
+    Returns:
+        go.Figure: a mesma figura recebida, com o layout aplicado.
+    """
     fig.update_layout(
         height=height,
         paper_bgcolor=t["bg_plot"],

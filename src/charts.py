@@ -6,6 +6,19 @@ from .utils import COLOR_M, COLOR_F, H_MEDIUM, H_LARGE, _apply_layout
 
 
 def processar_dados(df: pd.DataFrame):
+    """Deriva faixa etária e o recorte de idosos por UF a partir da base bruta.
+
+    Args:
+        df: DataFrame de um único ano, colunas `uf`, `idade`, `sexo`,
+            `populacao` (ver `src.data.carregar_dados`).
+
+    Returns:
+        tuple[pd.DataFrame, pd.DataFrame]:
+            - `df_proc`: mesma base recebida, com a coluna `faixa_etaria`
+              (bins de 5 em 5 anos, "100+" no topo) adicionada.
+            - `df_idosos`: uma linha por UF, com `total`, `idosos` (idade
+              >= 60) e `pct_idosos`.
+    """
     bins   = list(range(0, 101, 5)) + [200]
     labels = [f"{i}-{i+4}" for i in range(0, 100, 5)] + ["100+"]
 
@@ -25,6 +38,18 @@ def processar_dados(df: pd.DataFrame):
 
 
 def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
+    """Monta o mapa coroplético de % de idosos por estado.
+
+    Args:
+        df_idosos: uma linha por UF, com `pct_idosos`, `idosos`, `total`
+            (ver `processar_dados`).
+        t: dicionário de tema (cores) atual.
+        geojson: geometria dos estados (ver `src.data.carregar_geojson`),
+            casada pela sigla da UF via `featureidkey`.
+
+    Returns:
+        go.Figure: mapa Mapbox coroplético.
+    """
     map_style   = "carto-positron"
 
     color_scale = [[0, "#084c96"], [0.5, "#2B7BB9"], [1, "#63b3ed"]]
@@ -71,6 +96,18 @@ def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
 
 
 def fig_pizza(df: pd.DataFrame, t: dict, apenas_idosos: bool = False) -> go.Figure:
+    """Monta o gráfico de rosca de distribuição por sexo.
+
+    Args:
+        df: base processada (ver `processar_dados`), colunas `idade`,
+            `sexo`, `populacao`.
+        t: dicionário de tema (cores) atual.
+        apenas_idosos: quando True, restringe a base a idade >= 60 antes
+            de agregar (toggle "Apenas ≥ 60 anos" da UI).
+
+    Returns:
+        go.Figure: gráfico de rosca com o total no centro.
+    """
     from .utils import _fmt
     df_pie = df[df["idade"] >= 60].copy() if apenas_idosos else df.copy()
     agg = df_pie.groupby("sexo")["populacao"].sum().reset_index()
@@ -113,6 +150,19 @@ def fig_pizza(df: pd.DataFrame, t: dict, apenas_idosos: bool = False) -> go.Figu
 
 
 def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
+    """Monta a pirâmide etária (barras horizontais opostas por sexo).
+
+    Masculino é plotado como valores negativos (`x=-masc.values`) para
+    ficar à esquerda do eixo zero, convenção padrão de pirâmide etária.
+
+    Args:
+        df: base processada (ver `processar_dados`), precisa da coluna
+            `faixa_etaria`.
+        t: dicionário de tema (cores) atual.
+
+    Returns:
+        go.Figure: pirâmide etária com barras opostas.
+    """
     FAIXAS = [
         "0-4","5-9","10-14","15-19","20-24","25-29","30-34","35-39",
         "40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79",
@@ -160,6 +210,16 @@ def fig_piramide(df: pd.DataFrame, t: dict) -> go.Figure:
 
 
 def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
+    """Monta o ranking horizontal de estados por % de idosos.
+
+    Args:
+        df_idosos: uma linha por UF, com `pct_idosos` (ver `processar_dados`).
+        t: dicionário de tema (cores) atual.
+
+    Returns:
+        go.Figure: gráfico de barras horizontais, ordenado crescente (o
+            maior valor fica no topo, convenção do Plotly para barras `h`).
+    """
     df_r = df_idosos.sort_values("pct_idosos", ascending=True)
     fig = px.bar(
         df_r, x="pct_idosos", y="uf", orientation="h",
@@ -183,6 +243,17 @@ def fig_ranking(df_idosos: pd.DataFrame, t: dict) -> go.Figure:
 
 
 def fig_evolucao(df_evo: pd.DataFrame, ufs: list, t: dict) -> go.Figure:
+    """Monta a série histórica de população total (2010-2025) em milhões.
+
+    Args:
+        df_evo: população por UF e ano (ver `src.data.carregar_evolucao`).
+        ufs: siglas das UFs selecionadas no filtro; a soma é recalculada
+            sobre esse subconjunto a cada chamada.
+        t: dicionário de tema (cores) atual.
+
+    Returns:
+        go.Figure: gráfico de linha com marcadores, um ponto por ano.
+    """
     df_f  = df_evo[df_evo["uf"].isin(ufs)].copy()
     df_tot = df_f.groupby("ano")["populacao"].sum().reset_index()
     df_tot["populacao_M"] = df_tot["populacao"] / 1_000_000

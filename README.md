@@ -16,6 +16,12 @@ Acesso: https://telessaude.unb.br/cenarios/demografico
 - KPIs com comparativo ao ano anterior (população total, % idosos, % feminina, idade média)
 - Tema claro e escuro
 
+## Documentação
+
+| Documento | Descrição |
+|---|---|
+| [Documentação dos Gráficos](docs/DOCUMENTACAO_GRAFICOS.md) | Por que cada gráfico existe, como é calculado e o código |
+
 ## Filtros
 
 - Ano de referência — atualiza KPIs e gráficos, com comparativo automático ao ano anterior

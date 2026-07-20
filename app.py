@@ -1,3 +1,10 @@
+"""
+app.py — Dashboard Demográfico Brasil (Streamlit + Plotly).
+
+Distribuição etária, proporção de idosos e evolução populacional por
+estado, a partir das Projeções de População do IBGE (2010-2025).
+"""
+
 import streamlit as st
 
 from src.themes import THEMES, _css, inject_toggle
@@ -20,6 +27,7 @@ def _iniciar_warmup():
     """Roda uma vez por processo — pré-carrega dados mais comuns em background."""
     import threading
     def _bg():
+        """Alvo da thread de warmup: pré-carrega geojson, evolução e o ano mais recente."""
         try:
             from src.data import carregar_dados, carregar_evolucao, carregar_geojson
             carregar_geojson()
@@ -48,6 +56,11 @@ _ufs_disp    = sorted(_df_default["uf"].unique().tolist())
 
 # ── Callbacks ────────────────────────────────────────────────────────────────
 def _on_regiao_change():
+    """Callback do selectbox de região — preenche o multiselect de UFs.
+
+    Disparado quando o usuário escolhe uma região; substitui a seleção
+    atual do multiselect (`ms_ufs`) pelas UFs daquela região.
+    """
     regiao = st.session_state.get("sel_regiao", "— nenhum —")
     st.session_state["ms_ufs"] = (
         [u for u in REGIOES.get(regiao, []) if u in _ufs_disp]
@@ -55,6 +68,11 @@ def _on_regiao_change():
     )
 
 def _on_todos_change():
+    """Callback do checkbox "Todos os estados" — limpa a seleção ao desmarcar.
+
+    Ao desmarcar, esvazia o multiselect de UFs para o usuário escolher um
+    subconjunto explicitamente (em vez de manter a seleção anterior).
+    """
     if not st.session_state.get("chk_todos", True):
         st.session_state["ms_ufs"] = []
 
