@@ -43,11 +43,43 @@ Acesso: https://painel.cenarios.unb.br/cenarios/demografico
 ```bash
 git clone https://github.com/Mcardosor/dashboard-demografico
 cd dashboard-demografico
-pip install -r requirements.txt
+pip install -r requirements.lock.txt
 streamlit run app.py
 ```
 
-Acesse em `http://localhost:8501`. Python 3.10+.
+Acesse em `http://localhost:8501`. Python 3.11 (a imagem de produção é `python:3.11-slim`).
+
+## Dependências
+
+| Arquivo | Papel |
+|---|---|
+| `requirements.txt` | **Intenção** — as 4 dependências diretas |
+| `requirements.lock.txt` | **Realidade** — as 38 versões exatas; é daqui que o Dockerfile instala |
+
+As quatro diretas já estavam pinadas e conferem com a VM. O que faltava eram
+as 34 transitivas (altair, numpy, protobuf, pillow…), livres para mudar entre
+dois builds do mesmo commit. O lock foi capturado do container em execução, e
+não resolvido do zero, para que travar as versões não mudasse nada em produção.
+
+Para regenerar, depois de mexer no `requirements.txt`:
+
+```bash
+docker run --rm -v "$PWD:/w" -w /w python:3.11-slim \
+  sh -c "pip install -q -r requirements.txt && pip freeze" > requirements.lock.txt
+```
+
+Resolva **dentro do `python:3.11-slim`**, não no Python da sua máquina: a
+resolução muda conforme a versão do interpretador, e o que vale é a da imagem.
+
+## O que o CI cobre
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda a cada push e PR:
+`ruff check .`, o build da imagem, e um diff entre o `pip freeze` da imagem e o
+lock.
+
+**Este painel não tem testes.** O CI pega import quebrado, erro de sintaxe e
+lock que parou de instalar — não pega número errado. Conferir se o painel está
+mostrando o dado certo continua sendo trabalho de olhar o painel.
 
 ## Dados
 

@@ -1,3 +1,9 @@
+# Intenção: as dependências diretas do painel.
+#
+# Estas quatro já estavam pinadas e batem exatamente com o que roda na VM.
+# O que faltava eram as 34 transitivas (altair, numpy, protobuf, pillow…),
+# que o pip resolvia livremente a cada build — é o que requirements.lock.txt
+# passa a fixar. O Dockerfile instala do lock, não daqui.
 streamlit==1.45.1
 pandas==2.2.2
 plotly==5.24.1

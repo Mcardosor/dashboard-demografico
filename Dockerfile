@@ -4,8 +4,10 @@ WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Instala do lock (versões exatas), não do requirements.txt (diretas apenas) —
+# sem isso as transitivas mudam sozinhas entre dois builds do mesmo commit.
+COPY requirements.lock.txt .
+RUN pip install --no-cache-dir -r requirements.lock.txt
 
 COPY . .
 
