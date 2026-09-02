@@ -1,15 +1,19 @@
 """
-app.py — Dashboard Demográfico Brasil (Streamlit + Plotly).
+app.py — Dashboard Demográfico Brasil (Streamlit + Plotly + pydeck).
 
 Distribuição etária, proporção de idosos e evolução populacional por
 estado, a partir das Projeções de População do IBGE (2010-2025).
+
+O coroplético é o único gráfico fora do Plotly: mora em `src/mapa.py`, é
+desenhado com pydeck e não usa basemap. O porquê está em docs/performance.md.
 """
 
 import streamlit as st
 
 from src.themes import THEMES, _css, inject_toggle
 from src.data import anos_disponiveis, carregar_dados, carregar_evolucao, carregar_geojson
-from src.charts import processar_dados, fig_mapa, fig_pizza, fig_piramide, fig_ranking, fig_evolucao
+from src.charts import processar_dados, fig_pizza, fig_piramide, fig_ranking, fig_evolucao
+from src import mapa
 from src.utils import PLOTLY_CFG, REGIOES, _fmt, _delta_html, kpi_card, section_header, html_top5
 
 # ── Page config ───────────────────────────────────────────────────────────────
@@ -45,7 +49,7 @@ _iniciar_warmup()
 if "theme" not in st.session_state:
     st.session_state.theme = "light"
 
-GEOJSON = carregar_geojson()
+carregar_geojson()  # aquece o cache da malha antes do primeiro render
 _anos   = anos_disponiveis()
 
 # ── Dados carregados antes da sidebar ─────────────────────────────────────────
@@ -216,19 +220,8 @@ col_mapa, col_top5 = st.columns([3, 2])
 with col_mapa:
     st.markdown(section_header("01", "Proporção de Idosos por Estado",
         "Percentual da população com 60 anos ou mais em cada estado."), unsafe_allow_html=True)
-    try:
-        st.plotly_chart(fig_mapa(df_id_filt, t, GEOJSON), use_container_width=True, config=PLOTLY_CFG)
-    except Exception:
-        import plotly.express as px
-        from src.utils import H_LARGE
-        from src.charts import _apply_layout as _al
-        fig_bar = px.bar(
-            df_id_filt.sort_values("pct_idosos"), x="pct_idosos", y="uf",
-            orientation="h", color="pct_idosos", color_continuous_scale="YlOrRd",
-        )
-        _al(fig_bar, t, H_LARGE)
-        fig_bar.update_layout(coloraxis_showscale=False)
-        st.plotly_chart(fig_bar, use_container_width=True, config=PLOTLY_CFG)
+    st.pydeck_chart(mapa.deck(df_id_filt, t), use_container_width=True)
+    st.markdown(mapa.legenda(df_id_filt, t), unsafe_allow_html=True)
 
 with col_top5:
     st.markdown(section_header("02", "Top estados — % de idosos",

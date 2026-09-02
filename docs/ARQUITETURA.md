@@ -37,6 +37,7 @@ Streamlit renderiza no navegador
 | `app.py` | Entrada Streamlit — sidebar, filtros, layout, orquestra os módulos abaixo |
 | `src/data.py` | Carregamento e cache dos Parquet (única camada que toca disco) |
 | `src/charts.py` | Processamento (`processar_dados`) e construção das figuras Plotly |
+| `src/mapa.py` | O coroplético, em pydeck/deck.gl e sem basemap — ver [Performance](performance.md) |
 | `src/utils.py` | Formatação de números, HTML de KPI cards/tabelas, layout comum dos gráficos |
 | `src/themes.py` | Paleta de cores light/dark, CSS global, toggle de tema via JS |
 

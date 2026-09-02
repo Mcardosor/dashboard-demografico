@@ -37,64 +37,6 @@ def processar_dados(df: pd.DataFrame):
     return df_proc, df_idosos
 
 
-def fig_mapa(df_idosos: pd.DataFrame, t: dict, geojson: dict) -> go.Figure:
-    """Monta o mapa coroplético de % de idosos por estado.
-
-    Args:
-        df_idosos: uma linha por UF, com `pct_idosos`, `idosos`, `total`
-            (ver `processar_dados`).
-        t: dicionário de tema (cores) atual.
-        geojson: geometria dos estados (ver `src.data.carregar_geojson`),
-            casada pela sigla da UF via `featureidkey`.
-
-    Returns:
-        go.Figure: mapa Mapbox coroplético.
-    """
-    map_style   = "carto-positron"
-
-    color_scale = [[0, "#084c96"], [0.5, "#2B7BB9"], [1, "#63b3ed"]]
-
-    fig = px.choropleth_mapbox(
-        df_idosos,
-        geojson=geojson,
-        locations="uf",
-        featureidkey="properties.sigla",
-        color="pct_idosos",
-        color_continuous_scale=color_scale,
-        range_color=(0, df_idosos["pct_idosos"].max()),
-        mapbox_style=map_style,
-        zoom=3.2,
-        center={"lat": -14.24, "lon": -51.93},
-        opacity=0.75,
-        labels={"pct_idosos": "% Idosos", "uf": "UF"},
-        custom_data=["uf", "pct_idosos", "idosos", "total"],
-    )
-    fig.update_layout(
-        height=500,
-        paper_bgcolor=t["bg_plot"],
-        font_color=t["text"],
-        margin=dict(l=0, r=0, t=0, b=0),
-        coloraxis_colorbar=dict(
-            title=dict(text="% Idosos", font=dict(color=t["text"])),
-            tickfont=dict(color=t["text_muted"]),
-            bgcolor=t["bg_card"],
-            bordercolor=t["border"],
-            x=1.0, thickness=14,
-        ),
-    )
-    fig.update_traces(
-        marker_line_color=t["map_line"],
-        marker_line_width=0.6,
-        hovertemplate=(
-            "<b>%{customdata[0]}</b><br>"
-            "% Idosos: %{customdata[1]:.2f}%<br>"
-            "Idosos: %{customdata[2]:,.0f}<br>"
-            "Total: %{customdata[3]:,.0f}<extra></extra>"
-        ),
-    )
-    return fig
-
-
 def fig_pizza(df: pd.DataFrame, t: dict, apenas_idosos: bool = False) -> go.Figure:
     """Monta o gráfico de rosca de distribuição por sexo.
 

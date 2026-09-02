@@ -1,10 +1,16 @@
 # Intenção: as dependências diretas do painel.
 #
-# Estas quatro já estavam pinadas e batem exatamente com o que roda na VM.
-# O que faltava eram as 34 transitivas (altair, numpy, protobuf, pillow…),
-# que o pip resolvia livremente a cada build — é o que requirements.lock.txt
-# passa a fixar. O Dockerfile instala do lock, não daqui.
+# O que faltava eram as transitivas (altair, numpy, protobuf, pillow…), que o
+# pip resolvia livremente a cada build — é o que requirements.lock.txt fixa.
+# O Dockerfile instala do lock, não daqui.
 streamlit==1.45.1
 pandas==2.2.2
-plotly==5.24.1
+plotly==6.3.1
 pyarrow==16.1.0
+
+# O mapa. Já vinha no lock como transitiva do streamlit; virou direta quando o
+# coroplético saiu do Plotly (ver src/mapa.py e docs/performance.md).
+pydeck==0.9.3
+
+# geopandas e topojson NÃO entram aqui: são de build, usadas só por
+# scripts/preparar_geometria.py, que roda uma vez e escreve data/ufs.geojson.

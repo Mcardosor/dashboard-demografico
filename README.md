@@ -22,6 +22,7 @@ Acesso: https://painel.cenarios.unb.br/cenarios/demografico
 |---|---|
 | [Arquitetura](docs/ARQUITETURA.md) | Fluxo de dados ponta a ponta, módulos, deploy e limitações — comece por aqui |
 | [Documentação dos Gráficos](docs/DOCUMENTACAO_GRAFICOS.md) | Por que cada gráfico existe, como é calculado e o código |
+| [Performance](docs/performance.md) | Linha de base medida, o que foi otimizado e os alvos presos em teste |
 
 ## Filtros
 
@@ -34,8 +35,8 @@ Acesso: https://painel.cenarios.unb.br/cenarios/demografico
 | Camada | Tecnologia |
 |---|---|
 | Interface | Streamlit |
-| Visualizações | Plotly (`choropleth_mapbox`, `bar`, `pie`, `line`) |
-| Mapa | GeoJSON dos estados + `px.choropleth_mapbox` |
+| Visualizações | Plotly (`bar`, `pie`, `line`) |
+| Mapa | pydeck / deck.gl (`GeoJsonLayer`), **sem basemap** — malha pré-processada em `data/ufs.geojson` |
 | Dados | Parquet (IBGE), pandas, cache via `@st.cache_data` |
 
 ## Como rodar
@@ -48,6 +49,19 @@ streamlit run app.py
 ```
 
 Acesse em `http://localhost:8501`. Python 3.11 (a imagem de produção é `python:3.11-slim`).
+
+## Testes e scripts
+
+```bash
+pip install -r requirements-dev.txt
+pytest                            # 46 testes: malha, mapa e orçamento de tempo
+python -m scripts.medir_performance   # linha de base, sem o cache do Streamlit
+python -m scripts.preparar_geometria  # regera data/ufs.geojson a partir da malha crua
+```
+
+`preparar_geometria` só precisa rodar quando a malha de origem mudar — a saída
+é versionada. É o único script que usa geopandas e topojson, que por isso ficam
+em `requirements-dev.txt` e fora da imagem de produção.
 
 ## Dependências
 
