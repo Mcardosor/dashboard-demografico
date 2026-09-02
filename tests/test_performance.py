@@ -11,6 +11,11 @@ que já estava cacheada.
 
 O orçamento de **payload**, que é o outro lado da conta e o que de fato
 travava este painel, está em `test_mapa.py`.
+
+Os testes de teto absoluto levam a marca `tempo` e **não rodam no CI** — num
+runner compartilhado a medida diz mais sobre a carga da máquina alheia do que
+sobre o código. Ver a justificativa em `pytest.ini`. O que sobra no CI é a
+comparação relativa, que independe da velocidade da máquina.
 """
 
 from __future__ import annotations
@@ -53,6 +58,7 @@ def _mediana_ms(fn) -> float:
     return statistics.median(tempos)
 
 
+@pytest.mark.tempo
 def test_interacao_completa_sob_o_orcamento(base):
     df_raw, df_evo, df_proc, df_idosos = base
     ufs = sorted(df_idosos["uf"])
@@ -70,6 +76,7 @@ def test_interacao_completa_sob_o_orcamento(base):
     assert ms <= TETO_MS, f"{ms:.0f} ms"
 
 
+@pytest.mark.tempo
 def test_processar_dados_sob_o_orcamento(base):
     df_raw = base[0]
     ms = _mediana_ms(lambda: charts.processar_dados(df_raw))
@@ -91,6 +98,7 @@ def test_mapa_deixou_de_ser_a_figura_mais_cara(base):
     assert custo_mapa < custo_pizza
 
 
+@pytest.mark.tempo
 def test_geojson_carrega_rapido():
     """A malha pré-processada lê em poucos milissegundos; a crua levava 82."""
     ms = _mediana_ms(lambda: data.carregar_geojson.__wrapped__())

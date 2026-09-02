@@ -55,6 +55,7 @@ Acesse em `http://localhost:8501`. Python 3.11 (a imagem de produção é `pytho
 ```bash
 pip install -r requirements-dev.txt
 pytest                            # 46 testes: malha, mapa e orçamento de tempo
+pytest -m "not tempo"             # o subconjunto que o CI roda (sem tetos de relógio)
 python -m scripts.medir_performance   # linha de base, sem o cache do Streamlit
 python -m scripts.preparar_geometria  # regera data/ufs.geojson a partir da malha crua
 ```
@@ -62,6 +63,11 @@ python -m scripts.preparar_geometria  # regera data/ufs.geojson a partir da malh
 `preparar_geometria` só precisa rodar quando a malha de origem mudar — a saída
 é versionada. É o único script que usa geopandas e topojson, que por isso ficam
 em `requirements-dev.txt` e fora da imagem de produção.
+
+Os testes com a marca `tempo` cronometram relógio de parede contra um teto
+absoluto e ficam de fora do CI: num runner compartilhado a medida diz mais
+sobre a carga da máquina alheia do que sobre o código. O porquê está em
+`pytest.ini`.
 
 ## Dependências
 
