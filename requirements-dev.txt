@@ -1,0 +1,10 @@
+# Dependências de desenvolvimento — não entram na imagem de produção.
+-r requirements.txt
+
+# Testes
+pytest==8.3.4
+
+# Pré-processamento da malha (scripts/preparar_geometria.py). Rodam uma vez e
+# escrevem data/ufs.geojson; o painel em execução não importa nenhuma das duas.
+geopandas==1.0.1
+topojson==1.9

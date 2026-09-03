@@ -9,7 +9,13 @@ _DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 @st.cache_resource(show_spinner=False)
 def carregar_geojson() -> dict:
-    """Carrega o GeoJSON dos estados brasileiros usado no mapa coroplético.
+    """Carrega a malha das UFs usada no mapa coroplético.
+
+    Lê `ufs.geojson`, que é a saída de `scripts/preparar_geometria.py`:
+    simplificado topologicamente, com 5 casas decimais e só a propriedade
+    `sigla`. O `brazil-states.geojson` cru continua no repositório como
+    **origem** do pré-processamento — 3,4 MB e 85.585 vértices —, mas não é
+    lido em execução. Ver docs/performance.md.
 
     Cacheado como recurso (`cache_resource`) porque o dicionário é
     compartilhado entre sessões e não deve ser copiado a cada rerun.
@@ -18,7 +24,7 @@ def carregar_geojson() -> dict:
         dict: GeoJSON com a geometria dos estados, chaveado por
             `properties.sigla` (UF).
     """
-    path = os.path.join(_DATA_DIR, "brazil-states.geojson")
+    path = os.path.join(_DATA_DIR, "ufs.geojson")
     with open(path, encoding="utf-8") as f:
         return json.load(f)
 

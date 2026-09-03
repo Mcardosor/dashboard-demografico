@@ -1,11 +1,11 @@
 name: CI
 
-# Este painel não tem suíte de testes, então o CI cobre o que dá para verificar
-# sem ela: o código passa no linter, a imagem constrói, e o que ela instala é
-# exatamente o que está no lock.
+# O CI cobre: o código passa no linter, a suíte de testes passa, a imagem
+# constrói, e o que ela instala é exatamente o que está no lock.
 #
 # O que NÃO é coberto: se um número do painel está certo. Isso continua
-# dependendo de olhar o painel — ver a ressalva no README.
+# dependendo de olhar o painel — ver a ressalva no README. E os tetos de tempo
+# absoluto, que levam a marca `tempo` e ficam de fora aqui — ver pytest.ini.
 
 on:
   push:
@@ -26,6 +26,27 @@ jobs:
 
       - run: pip install ruff==0.16.2
       - run: ruff check .
+
+  testes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Do lock, e não de requirements-dev.txt: os testes precisam das mesmas
+      # versões que rodam em produção, e o dev traz geopandas e topojson, que
+      # são de build (scripts/preparar_geometria.py) e que a suíte não importa
+      # de propósito — instalá-las aqui custaria minutos por nada.
+      - run: pip install -r requirements.lock.txt pytest==8.3.4
+
+      # `-m "not tempo"` exclui os tetos de relógio de parede. Num runner
+      # compartilhado eles medem a carga da máquina alheia; o que sobra é
+      # determinístico — payload, malha, cor, enquadramento — mais a
+      # comparação relativa entre o mapa e os gráficos.
+      - run: pytest -m "not tempo" -q
 
   imagem:
     runs-on: ubuntu-latest

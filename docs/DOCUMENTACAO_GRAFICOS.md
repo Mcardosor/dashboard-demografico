@@ -6,11 +6,17 @@ Por que cada gráfico existe, como é calculado e onde está o código.
 
 **Por quê:** primeira leitura visual do envelhecimento populacional — onde a proporção de idosos é mais alta no Brasil.
 
-**Como é calculado:** `src/charts.py::processar_dados()` agrega a população por UF em dois totais: `total` (todas as idades) e `idosos` (idade ≥ 60), então calcula `pct_idosos = idosos / total * 100`. O mapa em si é um `choropleth_mapbox` colorido por essa proporção, casado ao GeoJSON dos estados pela sigla (`featureidkey="properties.sigla"`).
+**Como é calculado:** `src/charts.py::processar_dados()` agrega a população por UF em dois totais: `total` (todas as idades) e `idosos` (idade ≥ 60), então calcula `pct_idosos = idosos / total * 100`. O mapa é um `GeoJsonLayer` do deck.gl, via pydeck, com a cor de cada UF interpolada em Python na rampa `#084c96 → #2B7BB9 → #63b3ed` e casada à malha pela sigla.
 
-**Código:** `src/charts.py::fig_mapa()`
+**Código:** `src/mapa.py::deck()`, com a legenda em `src/mapa.py::legenda()`
 
-**Fallback:** se o Mapbox falhar (ex: sem geojson carregado), `app.py` cai para um gráfico de barras horizontal com a mesma métrica, pra nunca deixar a seção vazia.
+**Sem basemap.** Era um `choropleth_mapbox` sobre ladrilhos `carto-positron` até a CARTO passar a exigir chave — o painel em produção desenhava "API KEY REQUIRED" repetido sob a malha. Trocar de fornecedor de ladrilho só adiaria o problema: um coroplético por estado não precisa de rua nem de rio embaixo, a informação é a cor da UF. Sem ladrilho não há chave, nem requisição a terceiro, nem fornecedor que possa repetir isto.
+
+**A malha é pré-processada.** `scripts/preparar_geometria.py` roda uma vez e escreve `data/ufs.geojson`: simplificação topológica (85.585 → 4.469 vértices), 5 casas decimais e só a propriedade `sigla`. Só as UFs selecionadas são enviadas, e o spec sai sem indentação. O payload caiu de 1.953 KB para 98 KB no Brasil e 3 KB numa UF — ver [Performance](performance.md).
+
+**O enquadramento acompanha o filtro**, em vez do `zoom=3.2` fixo de antes. Ao calcular os limites, ilhas oceânicas afastadas são descartadas: **Fernando de Noronha é de Pernambuco** e, sem esse cuidado, selecionar PE desenharia um mapa de oceano.
+
+**Sem fallback.** O anterior existia porque o Mapbox podia falhar — dependia de um terceiro pela rede. Sem ladrilho não há essa falha, e manter uma segunda rota de mapa em Plotly significaria manter código morto que ninguém exercita.
 
 ## 02 · Top estados — % de idosos
 
